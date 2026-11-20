@@ -1,3 +1,5 @@
+Students--> 26i2610 [Ahmad Raza] and 26i2590 [Nizalia Naeem]
+From Ds_C 2026
 # The Last Train - Programming Fundamentals Project (Procedural / No Structs)
 
 CS-1002: Programming Fundamentals (AI & DS)
