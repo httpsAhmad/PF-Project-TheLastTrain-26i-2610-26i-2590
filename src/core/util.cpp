@@ -1,11 +1,11 @@
 #include "util.h"
-int clampInt(int value, int minValue, int maxValue){
-    if (value < minValue) {
-        return minValue;
-    } else if (value > maxValue) {
-        return maxValue;
+int clampInt(int val, int minVal, int maxVal){
+    if (val < minVal) {
+        return minVal;
+    } else if (val > maxVal) {
+        return maxVal;
     } else {
-        return value;
+        return val;
     }
 }
 bool stringEquals(const char* a, const char* b){
@@ -17,5 +17,24 @@ bool stringEquals(const char* a, const char* b){
         i++;
     }
     return a[i] == b[i];
+}
+void trimWhitespace(char* str){
+    int start = 0;
+    while (str[start] != '\0' && (str[start] == ' ' || str[start] == '\t' || str[start] == '\n')) {
+        start++;
+    }
+    int end = start;
+    while (str[end] != '\0') {
+        end++;
+    }
+    end--;
+    while (end >= start && (str[end] == ' ' || str[end] == '\t' || str[end] == '\n')) {
+        end--;
+    }
+    int newLength = end - start + 1;
+    for (int i = 0; i < newLength; i++) {
+        str[i] = str[start + i];
+    }
+    str[newLength] = '\0';
 }
 // Primitive helper utilities, clamping, and screen control
