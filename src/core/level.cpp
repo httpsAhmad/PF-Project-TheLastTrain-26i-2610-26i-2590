@@ -49,6 +49,23 @@ bool loadBuildingMap(const char *filename,
                     horizontalConn[floorNum - 1][c] = x;
                 }
             }
+            string itemLine;
+            if (getline(file, itemLine) && itemLine.length() >= 57)
+            {
+                for (int r = 0; r < ROOMS_PER_FLOOR; r++)
+                {
+                    int startCol = 9 + 12 * r;
+                    for (int col = startCol; col <= startCol + 10; col++)
+                    {
+                        char ch = itemLine[col];
+                        if (ch != ' ' && entityCounts[floorNum - 1][r] < MAX_ENTITIES_PER_ROOM)
+                        {
+                            roomEntities[floorNum - 1][r][entityCounts[floorNum - 1][r]] = ch;
+                            entityCounts[floorNum - 1][r]++;
+                        }
+                    }
+                }
+            }
         }
     }
 
