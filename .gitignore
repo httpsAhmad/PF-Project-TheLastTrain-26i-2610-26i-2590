@@ -1,3 +1,4 @@
 practice*.cpp
 practice_out.txt
 *.exe
+*.o
