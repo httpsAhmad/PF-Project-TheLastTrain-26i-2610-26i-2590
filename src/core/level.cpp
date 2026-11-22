@@ -39,7 +39,11 @@ bool loadBuildingMap(const char *filename,
         if (line.length() >= 57 && line[10] == 'F' && line[13] == 'R')
         {
             int floorNum = line[11] - '0';
-            cout << "Floor: " << floorNum << endl;
+            if (floorNum < 1 || floorNum > NUM_FLOORS)
+            {
+                cout << "Error: Invalid floor number in line: " << line << endl;
+                return false;
+            }
             for (int c = 0; c < ROOMS_PER_FLOOR - 1; c++)
             {
                 int col = 20 + 12 * c;
