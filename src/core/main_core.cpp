@@ -4,36 +4,39 @@
 #include "viewer_iface.h"
 #include <iostream>
 
-int main() {
+int main()
+{
     // Player State Primitives
     int playerFloor = 1;
     int playerRoom = 1;
     int energy = INITIAL_ENERGY;
     int time = INITIAL_TIME;
     int score = INITIAL_SCORE;
-    
+
     char inventory[MAX_INVENTORY_CAPACITY];
     int inventoryCount = 0;
     int emergencyTripsLeft = 0;
 
     // Objective State Booleans
-    bool objectives[NUM_OBJECTIVES] = { false };
+    bool objectives[NUM_OBJECTIVES] = {false};
 
     // Building Connectivity & Entity Parallel Matrices
     char horizontalConn[NUM_FLOORS][ROOMS_PER_FLOOR - 1];
     char roomEntities[NUM_FLOORS][ROOMS_PER_FLOOR][MAX_ENTITIES_PER_ROOM];
-    int entityCounts[NUM_FLOORS][ROOMS_PER_FLOOR] = { 0 };
+    int entityCounts[NUM_FLOORS][ROOMS_PER_FLOOR] = {0};
 
-    const char* mapFile = "data/building.txt";
-    const char* initStateFile = "data/initial-state.txt";
+    const char *mapFile = "data/building.txt";
+    const char *initStateFile = "data/initial-state.txt";
 
-    if (!loadBuildingMap(mapFile, horizontalConn, roomEntities, entityCounts)) {
+    if (!loadBuildingMap(mapFile, horizontalConn, roomEntities, entityCounts))
+    {
         std::cerr << "Error: Could not load " << mapFile << "\n";
         return 1;
     }
 
     if (!loadInitialState(initStateFile, playerFloor, playerRoom, energy, time, score,
-                          inventory, inventoryCount, objectives, emergencyTripsLeft)) {
+                          inventory, inventoryCount, objectives, emergencyTripsLeft))
+    {
         std::cerr << "Error: Could not load " << initStateFile << "\n";
         return 1;
     }
