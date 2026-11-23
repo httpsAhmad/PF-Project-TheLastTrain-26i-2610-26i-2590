@@ -1,6 +1,5 @@
 #include "logger.h"
 #include "util.h"
-#include "logger.h"
 #include <iostream>
 #include <fstream>
 #include <cstring>
