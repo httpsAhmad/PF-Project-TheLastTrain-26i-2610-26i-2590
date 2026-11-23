@@ -74,5 +74,4 @@ void clearScreen()
         cout << "\n";
     }
 }
-
 // Primitive helper utilities, clamping, and screen control

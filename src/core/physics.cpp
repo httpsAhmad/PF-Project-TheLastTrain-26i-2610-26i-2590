@@ -1,16 +1,13 @@
 #include "physics.h"
 #include "util.h"
-
 void applyResourceDelta(int &energy, int &time, int deltaEnergy, int deltaTime)
 {
     energy = clampInt(energy + deltaEnergy, 0, MAX_ENERGY);
     time = clampInt(time + deltaTime, 0, MAX_TIME);
 }
-
 void applyScoreDelta(int &score, int deltaScore)
 {
     score += deltaScore;
-
     if (score < 0)
     {
         score = 0;
@@ -30,7 +27,6 @@ bool hasItem(const char inventory[MAX_INVENTORY_CAPACITY],
             return true;
         }
     }
-
     return false;
 }
 bool addItem(char inventory[MAX_INVENTORY_CAPACITY],
@@ -48,10 +44,8 @@ bool addItem(char inventory[MAX_INVENTORY_CAPACITY],
     {
         return false;
     }
-
     inventory[inventoryCount] = itemSymbol;
     inventoryCount++;
-
     return true;
 }
 bool removeItem(char inventory[MAX_INVENTORY_CAPACITY],
@@ -69,13 +63,10 @@ bool removeItem(char inventory[MAX_INVENTORY_CAPACITY],
             {
                 inventory[j] = inventory[j + 1];
             }
-
             inventoryCount--;
-
             return true;
         }
     }
-
     return false;
 }
 bool isDirectlyConnected(int fromF, int fromR, int toF, int toR,
@@ -83,7 +74,6 @@ bool isDirectlyConnected(int fromF, int fromR, int toF, int toR,
                          char &outConnType)
 {
     outConnType = CONN_NONE;
-
     if (fromF < 0 || fromF >= NUM_FLOORS ||
         toF < 0 || toF >= NUM_FLOORS ||
         fromR < 0 || fromR >= ROOMS_PER_FLOOR ||
@@ -91,19 +81,15 @@ bool isDirectlyConnected(int fromF, int fromR, int toF, int toR,
     {
         return false;
     }
-
     if (fromF != toF)
     {
         return false;
     }
-
     if (fromR - toR != 1 && toR - fromR != 1)
     {
         return false;
     }
-
     int connectionIndex;
-
     if (fromR < toR)
     {
         connectionIndex = fromR;
@@ -112,9 +98,7 @@ bool isDirectlyConnected(int fromF, int fromR, int toF, int toR,
     {
         connectionIndex = toR;
     }
-
     char connection = horizontalConn[fromF][connectionIndex];
-
     if (connection != CONN_DOOR &&
         connection != CONN_WINDOW &&
         connection != CONN_LOCKED_DOOR)
@@ -122,7 +106,6 @@ bool isDirectlyConnected(int fromF, int fromR, int toF, int toR,
         return false;
     }
     outConnType = connection;
-
     return true;
 }
 bool canTraverse(int targetFloor, int targetRoom, char connType,
@@ -134,7 +117,6 @@ bool canTraverse(int targetFloor, int targetRoom, char connType,
     {
         return false;
     }
-
     if (inventoryCount < 0 || inventoryCount > MAX_INVENTORY_CAPACITY)
     {
         return false;
@@ -155,7 +137,6 @@ bool canTraverse(int targetFloor, int targetRoom, char connType,
     {
         return true;
     }
-
     if (connType == '1')
     {
         return true;
@@ -166,15 +147,12 @@ bool canTraverse(int targetFloor, int targetRoom, char connType,
         {
             return hasItem(inventory, inventoryCount, ENT_LIFT_PASS);
         }
-
         if (emergencyTripsLeft > 0 &&
             hasItem(inventory, inventoryCount, ENT_EMERGENCY_CARD))
         {
             return true;
         }
-
         return false;
     }
-
     return false;
 }

@@ -105,20 +105,17 @@ bool loadInitialState(const char *filename,
     score = INITIAL_SCORE;
     playerFloor = 1;
     playerRoom = 1;
-
     inventoryCount = 0;
     for (int i = 0; i < MAX_INVENTORY_CAPACITY; i++)
     {
         inventory[i] = ENT_NONE;
     }
     emergencyTripsLeft = 0;
-
     for (int i = 0; i < NUM_OBJECTIVES; i++)
     {
         objectives[i] = false;
     }
     ifstream file(filename);
-
     if (!file)
     {
         cout << "Error: Could not open " << filename << endl;
@@ -128,36 +125,29 @@ bool loadInitialState(const char *filename,
     while (getline(file, line))
     {
         size_t colonPos = line.find(':');
-
         if (colonPos == string::npos)
         {
             continue;
         }
-
         size_t keyLength = colonPos;
         size_t valueLength = line.length() - colonPos - 1;
-
         if (keyLength >= MAX_LINE_LEN || valueLength >= MAX_LINE_LEN)
         {
             cout << "Error: Line too long in initial state file." << endl;
             return false;
         }
-
         char key[MAX_LINE_LEN];
         char value[MAX_LINE_LEN];
-
         for (size_t i = 0; i < keyLength; i++)
         {
             key[i] = line[i];
         }
         key[keyLength] = '\0';
-
         for (size_t i = 0; i < valueLength; i++)
         {
             value[i] = line[colonPos + 1 + i];
         }
         value[valueLength] = '\0';
-
         trimWhitespace(key);
         trimWhitespace(value);
         if (stringEquals(key, "INITIAL_ENERGY"))
@@ -255,7 +245,6 @@ bool loadInitialState(const char *filename,
     }
     return true;
 }
-
 bool validateStartingRoom(int startFloor, int startRoom,
                           const char horizontalConn[NUM_FLOORS][ROOMS_PER_FLOOR - 1])
 {
@@ -265,18 +254,12 @@ bool validateStartingRoom(int startFloor, int startRoom,
     {
         return false;
     }
-
     bool visited[NUM_FLOORS][ROOMS_PER_FLOOR] = {false};
-
     visited[startFloor - 1][startRoom - 1] = true;
-
     bool changed = true;
-
-    // Check reachable rooms without using Lift 2
     while (changed)
     {
         changed = false;
-
         for (int f = 0; f < NUM_FLOORS; f++)
         {
             for (int r = 0; r < ROOMS_PER_FLOOR; r++)
@@ -285,12 +268,9 @@ bool validateStartingRoom(int startFloor, int startRoom,
                 {
                     continue;
                 }
-
-                // Check left connection
                 if (r > 0)
                 {
                     char connection = horizontalConn[f][r - 1];
-
                     if ((connection == CONN_DOOR ||
                          connection == CONN_WINDOW) &&
                         !visited[f][r - 1])
@@ -299,12 +279,9 @@ bool validateStartingRoom(int startFloor, int startRoom,
                         changed = true;
                     }
                 }
-
-                // Check right connection
                 if (r < ROOMS_PER_FLOOR - 1)
                 {
                     char connection = horizontalConn[f][r];
-
                     if ((connection == CONN_DOOR ||
                          connection == CONN_WINDOW) &&
                         !visited[f][r + 1])
@@ -313,8 +290,6 @@ bool validateStartingRoom(int startFloor, int startRoom,
                         changed = true;
                     }
                 }
-
-                // Staircase 1: F1-R1 <-> F2-R1
                 if (f == 0 && r == 0 && !visited[1][0])
                 {
                     visited[1][0] = true;
@@ -325,8 +300,6 @@ bool validateStartingRoom(int startFloor, int startRoom,
                     visited[0][0] = true;
                     changed = true;
                 }
-
-                // Staircase 2: F2-R1 <-> F3-R1
                 if (f == 1 && r == 0 && !visited[2][0])
                 {
                     visited[2][0] = true;
@@ -337,8 +310,6 @@ bool validateStartingRoom(int startFloor, int startRoom,
                     visited[1][0] = true;
                     changed = true;
                 }
-
-                // Staircase 3: F4-R1 <-> F5-R1
                 if (f == 3 && r == 0 && !visited[4][0])
                 {
                     visited[4][0] = true;
@@ -349,8 +320,6 @@ bool validateStartingRoom(int startFloor, int startRoom,
                     visited[3][0] = true;
                     changed = true;
                 }
-
-                // Lift 1: F1-R2/R3 <-> F2-R2/R3
                 if (f == 0 && (r == 1 || r == 2) &&
                     !visited[1][r])
                 {
