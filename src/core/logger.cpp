@@ -5,7 +5,7 @@
 #include <fstream>
 #include <cstring>
 using namespace std;
-bool saveGameStateToFile(const char* filename,
+bool saveGameStateToFile(const char *filename,
                          int playerFloor, int playerRoom,
                          int energy, int time, int score,
                          const char inventory[MAX_INVENTORY_CAPACITY], int inventoryCount,
@@ -65,20 +65,20 @@ bool saveGameStateToFile(const char* filename,
             for (int e = 0; e < entityCounts[f][r]; e++)
             {
                 file << static_cast<int>(
-                    static_cast<unsigned char>(roomEntities[f][r][e])
-                ) << " ";
+                            static_cast<unsigned char>(roomEntities[f][r][e]))
+                     << " ";
             }
             file << "\n";
         }
     }
-    file.close(); 
+    file.close();
     return !file.fail();
 }
-bool loadGameStateFromFile(const char* filename,
-                           int& playerFloor, int& playerRoom,
-                           int& energy, int& time, int& score,
-                           char inventory[MAX_INVENTORY_CAPACITY], int& inventoryCount,
-                           bool objectives[NUM_OBJECTIVES], int& emergencyTripsLeft,
+bool loadGameStateFromFile(const char *filename,
+                           int &playerFloor, int &playerRoom,
+                           int &energy, int &time, int &score,
+                           char inventory[MAX_INVENTORY_CAPACITY], int &inventoryCount,
+                           bool objectives[NUM_OBJECTIVES], int &emergencyTripsLeft,
                            char roomEntities[NUM_FLOORS][ROOMS_PER_FLOOR][MAX_ENTITIES_PER_ROOM],
                            int entityCounts[NUM_FLOORS][ROOMS_PER_FLOOR])
 {
@@ -99,9 +99,7 @@ bool loadGameStateFromFile(const char* filename,
     }
     int tempFloor, tempRoom, tempEnergy, tempTime;
     int tempScore, tempInventoryCount, tempEmergencyTrips;
-    file >> tempFloor >> tempRoom
-         >> tempEnergy >> tempTime >> tempScore
-         >> tempInventoryCount >> tempEmergencyTrips;
+    file >> tempFloor >> tempRoom >> tempEnergy >> tempTime >> tempScore >> tempInventoryCount >> tempEmergencyTrips;
     if (!file ||
         tempFloor < 0 || tempFloor >= NUM_FLOORS ||
         tempRoom < 0 || tempRoom >= ROOMS_PER_FLOOR ||
@@ -194,7 +192,7 @@ bool loadGameStateFromFile(const char* filename,
 
     return true;
 }
-void writeGameSummaryReport(const char* filename,
+void writeGameSummaryReport(const char *filename,
                             int score, int remainingEnergy, int remainingTime,
                             const bool objectives[NUM_OBJECTIVES], bool victory)
 {
@@ -207,25 +205,24 @@ void writeGameSummaryReport(const char* filename,
     {
         return;
     }
-    const char* objectiveNames[NUM_OBJECTIVES] =
-    {
-        "Master Key Collected",
-        "Clue 4 Found",
-        "Clue 2 Found",
-        "Clue 7 Found",
-        "Cabinet Unlocked",
-        "Train Key Collected",
-        "Fuse Collected",
-        "Fuse Installed",
-        "Lift Pass Collected",
-        "Lift 2 Activated",
-        "Passenger Rescued",
-        "Cat Carrier Collected",
-        "Cat Secured",
-        "Train Prepared",
-        "Mission Won",
-        "Mission Failed"
-    };
+    const char *objectiveNames[NUM_OBJECTIVES] =
+        {
+            "Master Key Collected",
+            "Clue 4 Found",
+            "Clue 2 Found",
+            "Clue 7 Found",
+            "Cabinet Unlocked",
+            "Train Key Collected",
+            "Fuse Collected",
+            "Fuse Installed",
+            "Lift Pass Collected",
+            "Lift 2 Activated",
+            "Passenger Rescued",
+            "Cat Carrier Collected",
+            "Cat Secured",
+            "Train Prepared",
+            "Mission Won",
+            "Mission Failed"};
     file << "====================================\n";
     file << "       THE LAST TRAIN REPORT\n";
     file << "====================================\n\n";
