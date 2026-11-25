@@ -80,10 +80,20 @@ bool loadBuildingMap(const char *filename,
                     for (int col = startCol; col <= startCol + 10; col++)
                     {
                         char ch = itemLine[col];
-                        if (ch != ' ' && entityCounts[floorNum - 1][r] < MAX_ENTITIES_PER_ROOM)
+                        int copies;
+                        if (ch == ENT_ENERGY_PACK)
                         {
-                            roomEntities[floorNum - 1][r][entityCounts[floorNum - 1][r]] = ch;
-                            entityCounts[floorNum - 1][r]++;
+                            copies = 2;
+                        }
+                        else
+                            copies = 1;
+                        for (int i = 0; i < copies; i++)
+                        {
+                            if (ch != ' ' && entityCounts[floorNum - 1][r] < MAX_ENTITIES_PER_ROOM)
+                            {
+                                roomEntities[floorNum - 1][r][entityCounts[floorNum - 1][r]] = ch;
+                                entityCounts[floorNum - 1][r]++;
+                            }
                         }
                     }
                 }
@@ -103,9 +113,24 @@ bool loadInitialState(const char *filename,
     energy = INITIAL_ENERGY;
     time = INITIAL_TIME;
     score = INITIAL_SCORE;
-    playerFloor = 1;
-    playerRoom = 1;
+    playerFloor = 0;
+    playerRoom = 0;
     inventoryCount = 0;
+    if (energy < 0 || energy > MAX_ENERGY)
+    {
+        cout << "Error: Initial energy out of range." << endl;
+        return false;
+    }
+    if (time < 0 || time > MAX_TIME)
+    {
+        cout << "Error: Initial time out of range." << endl;
+        return false;
+    }
+    if (score < 0)
+    {
+        cout << "Error: Initial score cannot be negative." << endl;
+        return false;
+    }
     for (int i = 0; i < MAX_INVENTORY_CAPACITY; i++)
     {
         inventory[i] = ENT_NONE;

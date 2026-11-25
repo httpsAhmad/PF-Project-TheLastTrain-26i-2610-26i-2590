@@ -32,11 +32,7 @@ bool hasItem(const char inventory[MAX_INVENTORY_CAPACITY],
 bool addItem(char inventory[MAX_INVENTORY_CAPACITY],
              int &inventoryCount, char itemSymbol)
 {
-    if (inventoryCount >= MAX_INVENTORY_CAPACITY)
-    {
-        return false;
-    }
-    if (inventoryCount < 0 || inventoryCount > MAX_INVENTORY_CAPACITY)
+    if (inventoryCount < 0 || inventoryCount >= MAX_INVENTORY_CAPACITY)
     {
         return false;
     }

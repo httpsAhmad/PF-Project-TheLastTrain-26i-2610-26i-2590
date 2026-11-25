@@ -1,6 +1,4 @@
 #include "logger.h"
-#include "util.h"
-#include <iostream>
 #include <fstream>
 #include <cstring>
 using namespace std;
@@ -91,6 +89,7 @@ bool loadGameStateFromFile(const char *filename,
         return false;
     }
     char fileHeader[32];
+    file.width(sizeof(fileHeader));
     file >> fileHeader;
     if (!file || strcmp(fileHeader, "THE_LAST_TRAIN_SAVE_V1") != 0)
     {
