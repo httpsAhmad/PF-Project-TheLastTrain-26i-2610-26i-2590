@@ -20,13 +20,14 @@ void renderDashboard(int playerFloor, int playerRoom,
     cout << "Score           : " << score << '\n';
     cout << "Emergency Trips : " << emergencyTripsLeft << '\n';
     cout << "\n---------- INVENTORY ----------\n";
-    if (inventoryCount <= 0)
-    {
-        cout << "Inventory is empty.\n";
-    }
-    else if (inventoryCount > MAX_INVENTORY_CAPACITY)
+    if (inventoryCount < 0 ||
+        inventoryCount > MAX_INVENTORY_CAPACITY)
     {
         cout << "Invalid inventory count.\n";
+    }
+    else if (inventoryCount == 0)
+    {
+        cout << "Inventory is empty.\n";
     }
     else
     {

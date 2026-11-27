@@ -3,30 +3,54 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <climits>
 using namespace std;
 static bool parseNumber(const char *str, int &outValue)
 {
     if (str == nullptr || *str == '\0')
-    {
         return false;
-    }
+
     int result = 0;
+
     for (int i = 0; str[i] != '\0'; i++)
     {
         if (str[i] < '0' || str[i] > '9')
-        {
             return false;
-        }
-        result = result * 10 + (str[i] - '0');
+
+        int digit = str[i] - '0';
+
+        if (result > (INT_MAX - digit) / 10)
+            return false;
+
+        result = result * 10 + digit;
     }
+
     outValue = result;
     return true;
+}
+static bool parseYesNo(const char *value, bool &result)
+{
+    if (stringEquals(value, "YES"))
+    {
+        result = true;
+        return true;
+    }
+
+    if (stringEquals(value, "NO"))
+    {
+        result = false;
+        return true;
+    }
+
+    return false;
 }
 bool loadBuildingMap(const char *filename,
                      char horizontalConn[NUM_FLOORS][ROOMS_PER_FLOOR - 1],
                      char roomEntities[NUM_FLOORS][ROOMS_PER_FLOOR][MAX_ENTITIES_PER_ROOM],
                      int entityCounts[NUM_FLOORS][ROOMS_PER_FLOOR])
 {
+    if (filename == nullptr)
+        return false;
     ifstream file(filename);
     if (!file)
     {
@@ -72,28 +96,33 @@ bool loadBuildingMap(const char *filename,
                 }
             }
             string itemLine;
-            if (getline(file, itemLine) && itemLine.length() >= 57)
+
+            if (!getline(file, itemLine) || itemLine.length() < 57)
             {
-                for (int r = 0; r < ROOMS_PER_FLOOR; r++)
+                cout << "Error: Missing or invalid entity row for floor "
+                     << floorNum << endl;
+                return false;
+            }
+
+            for (int r = 0; r < ROOMS_PER_FLOOR; r++)
+            {
+                int startCol = 9 + 12 * r;
+
+                for (int col = startCol; col <= startCol + 10; col++)
                 {
-                    int startCol = 9 + 12 * r;
-                    for (int col = startCol; col <= startCol + 10; col++)
+                    char ch = itemLine[col];
+
+                    int copies = (ch == ENT_ENERGY_PACK) ? 2 : 1;
+
+                    for (int i = 0; i < copies; i++)
                     {
-                        char ch = itemLine[col];
-                        int copies;
-                        if (ch == ENT_ENERGY_PACK)
+                        if (ch != ENT_NONE &&
+                            entityCounts[floorNum - 1][r] < MAX_ENTITIES_PER_ROOM)
                         {
-                            copies = 2;
-                        }
-                        else
-                            copies = 1;
-                        for (int i = 0; i < copies; i++)
-                        {
-                            if (ch != ' ' && entityCounts[floorNum - 1][r] < MAX_ENTITIES_PER_ROOM)
-                            {
-                                roomEntities[floorNum - 1][r][entityCounts[floorNum - 1][r]] = ch;
-                                entityCounts[floorNum - 1][r]++;
-                            }
+                            roomEntities[floorNum - 1][r]
+                                        [entityCounts[floorNum - 1][r]] = ch;
+
+                            entityCounts[floorNum - 1][r]++;
                         }
                     }
                 }
@@ -116,44 +145,31 @@ bool loadInitialState(const char *filename,
     playerFloor = 0;
     playerRoom = 0;
     inventoryCount = 0;
-    if (energy < 0 || energy > MAX_ENERGY)
-    {
-        cout << "Error: Initial energy out of range." << endl;
-        return false;
-    }
-    if (time < 0 || time > MAX_TIME)
-    {
-        cout << "Error: Initial time out of range." << endl;
-        return false;
-    }
-    if (score < 0)
-    {
-        cout << "Error: Initial score cannot be negative." << endl;
-        return false;
-    }
-    for (int i = 0; i < MAX_INVENTORY_CAPACITY; i++)
-    {
-        inventory[i] = ENT_NONE;
-    }
     emergencyTripsLeft = 0;
+
+    for (int i = 0; i < MAX_INVENTORY_CAPACITY; i++)
+        inventory[i] = ENT_NONE;
+
     for (int i = 0; i < NUM_OBJECTIVES; i++)
-    {
         objectives[i] = false;
-    }
+
+    if (filename == nullptr)
+        return false;
+
     ifstream file(filename);
     if (!file)
     {
         cout << "Error: Could not open " << filename << endl;
         return false;
     }
+
     string line;
     while (getline(file, line))
     {
         size_t colonPos = line.find(':');
         if (colonPos == string::npos)
-        {
             continue;
-        }
+
         size_t keyLength = colonPos;
         size_t valueLength = line.length() - colonPos - 1;
         if (keyLength >= MAX_LINE_LEN || valueLength >= MAX_LINE_LEN)
@@ -161,115 +177,112 @@ bool loadInitialState(const char *filename,
             cout << "Error: Line too long in initial state file." << endl;
             return false;
         }
+
         char key[MAX_LINE_LEN];
         char value[MAX_LINE_LEN];
+
         for (size_t i = 0; i < keyLength; i++)
-        {
             key[i] = line[i];
-        }
         key[keyLength] = '\0';
+
         for (size_t i = 0; i < valueLength; i++)
-        {
             value[i] = line[colonPos + 1 + i];
-        }
         value[valueLength] = '\0';
+
         trimWhitespace(key);
         trimWhitespace(value);
+
         if (stringEquals(key, "INITIAL_ENERGY"))
         {
-            int result = 0;
-            if (!parseNumber(value, result))
+            if (!parseNumber(value, energy))
             {
                 cout << "Error: Invalid initial energy value: " << value << endl;
                 return false;
             }
-            energy = result;
         }
         else if (stringEquals(key, "INITIAL_TIME"))
         {
-            int result = 0;
-            if (!parseNumber(value, result))
+            if (!parseNumber(value, time))
             {
                 cout << "Error: Invalid initial time value: " << value << endl;
                 return false;
             }
-            time = result;
         }
         else if (stringEquals(key, "INITIAL_SCORE"))
         {
-            int result = 0;
-
-            if (!parseNumber(value, result))
+            if (!parseNumber(value, score))
             {
                 cout << "Error: Invalid initial score value: " << value << endl;
                 return false;
             }
-            score = result;
         }
         else if (stringEquals(key, "INITIAL_INVENTORY"))
         {
-            if (stringEquals(value, "NONE"))
-            {
-                inventoryCount = 0;
-            }
-            else
+            if (!stringEquals(value, "NONE"))
             {
                 cout << "Error: Invalid initial inventory value: " << value << endl;
                 return false;
             }
+            inventoryCount = 0;
         }
         else if (stringEquals(key, "PASSENGER_RESCUED"))
         {
-            if (stringEquals(value, "YES"))
-            {
-                objectives[OBJ_PASSENGER_RESCUED] = true;
-            }
+            if (!parseYesNo(value, objectives[OBJ_PASSENGER_RESCUED]))
+                return false;
         }
         else if (stringEquals(key, "CAT_RESCUED"))
         {
-            if (stringEquals(value, "YES"))
-            {
-                objectives[OBJ_CAT_SECURED] = true;
-            }
+            if (!parseYesNo(value, objectives[OBJ_CAT_SECURED]))
+                return false;
         }
         else if (stringEquals(key, "CABINET_UNLOCKED"))
         {
-            if (stringEquals(value, "YES"))
-            {
-                objectives[OBJ_CABINET_UNLOCKED] = true;
-            }
+            if (!parseYesNo(value, objectives[OBJ_CABINET_UNLOCKED]))
+                return false;
         }
         else if (stringEquals(key, "TRAIN_KEY_COLLECTED"))
         {
-            if (stringEquals(value, "YES"))
-            {
-                objectives[OBJ_TRAIN_KEY] = true;
-            }
+            if (!parseYesNo(value, objectives[OBJ_TRAIN_KEY]))
+                return false;
         }
         else if (stringEquals(key, "FUSE_INSTALLED"))
         {
-            if (stringEquals(value, "YES"))
-            {
-                objectives[OBJ_FUSE_INSTALLED] = true;
-            }
+            if (!parseYesNo(value, objectives[OBJ_FUSE_INSTALLED]))
+                return false;
         }
         else if (stringEquals(key, "LIFT_PASS_COLLECTED"))
         {
-            if (stringEquals(value, "YES"))
-            {
-                objectives[OBJ_LIFT_PASS] = true;
-            }
+            if (!parseYesNo(value, objectives[OBJ_LIFT_PASS]))
+                return false;
         }
         else if (stringEquals(key, "TRAIN_PREPARED"))
         {
-            if (stringEquals(value, "YES"))
-            {
-                objectives[OBJ_TRAIN_PREPARED] = true;
-            }
+            if (!parseYesNo(value, objectives[OBJ_TRAIN_PREPARED]))
+                return false;
         }
     }
+
+    if (energy < 0 || energy > MAX_ENERGY)
+    {
+        cout << "Error: Initial energy out of range." << endl;
+        return false;
+    }
+
+    if (time < 0 || time > MAX_TIME)
+    {
+        cout << "Error: Initial time out of range." << endl;
+        return false;
+    }
+
+    if (score < 0)
+    {
+        cout << "Error: Initial score cannot be negative." << endl;
+        return false;
+    }
+
     return true;
 }
+
 bool validateStartingRoom(int startFloor, int startRoom,
                           const char horizontalConn[NUM_FLOORS][ROOMS_PER_FLOOR - 1])
 {
@@ -356,6 +369,34 @@ bool validateStartingRoom(int startFloor, int startRoom,
                 {
                     visited[0][r] = true;
                     changed = true;
+                }
+                // Lift 2 connects Floor 2, Floor 4 and Floor 5, Room 4.
+                if (f == 1 && r == 3)
+                {
+                    if (!visited[3][3])
+                    {
+                        visited[3][3] = true;
+                        changed = true;
+                    }
+                    if (!visited[4][3])
+                    {
+                        visited[4][3] = true;
+                        changed = true;
+                    }
+                }
+                else if ((f == 3 || f == 4) && r == 3)
+                {
+                    if (!visited[1][3])
+                    {
+                        visited[1][3] = true;
+                        changed = true;
+                    }
+                    int otherFloor = (f == 3) ? 4 : 3;
+                    if (!visited[otherFloor][3])
+                    {
+                        visited[otherFloor][3] = true;
+                        changed = true;
+                    }
                 }
             }
         }

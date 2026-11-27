@@ -44,7 +44,7 @@ bool installFuseControlPanel(char inventory[MAX_INVENTORY_CAPACITY],
         return false;
     objectives[OBJ_FUSE_INSTALLED] = true;
     objectives[OBJ_LIFT2_ACTIVE] = true;
-    applyScoreDelta(score, 20);
+    applyScoreDelta(score, SCORE_INSTALL_FUSE);
     return true;
 }
 bool verifyCabinetCode(const char *enteredCode,
