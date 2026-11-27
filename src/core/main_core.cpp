@@ -6,7 +6,6 @@
 
 int main()
 {
-    // Player State Primitives
     int playerFloor = 1;
     int playerRoom = 1;
     int energy = INITIAL_ENERGY;
@@ -17,10 +16,8 @@ int main()
     int inventoryCount = 0;
     int emergencyTripsLeft = 0;
 
-    // Objective State Booleans
     bool objectives[NUM_OBJECTIVES] = {false};
 
-    // Building Connectivity & Entity Parallel Matrices
     char horizontalConn[NUM_FLOORS][ROOMS_PER_FLOOR - 1];
     char roomEntities[NUM_FLOORS][ROOMS_PER_FLOOR][MAX_ENTITIES_PER_ROOM];
     int entityCounts[NUM_FLOORS][ROOMS_PER_FLOOR] = {0};
