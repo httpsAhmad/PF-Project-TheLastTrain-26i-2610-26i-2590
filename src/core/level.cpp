@@ -142,8 +142,8 @@ bool loadInitialState(const char *filename,
     energy = INITIAL_ENERGY;
     time = INITIAL_TIME;
     score = INITIAL_SCORE;
-    playerFloor = 0;
-    playerRoom = 0;
+    playerFloor = 1;
+    playerRoom = 1;
     inventoryCount = 0;
     emergencyTripsLeft = 0;
 

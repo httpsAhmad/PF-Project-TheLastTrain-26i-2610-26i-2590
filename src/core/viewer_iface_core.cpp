@@ -11,8 +11,8 @@ void renderDashboard(int playerFloor, int playerRoom,
     cout << "\n====================================\n";
     cout << "          THE LAST TRAIN\n";
     cout << "====================================\n";
-    cout << "Player Location : Floor " << playerFloor + 1
-         << ", Room " << playerRoom + 1 << '\n';
+    cout << "Player Location : Floor " << playerFloor
+         << ", Room " << playerRoom << '\n';
     cout << "Energy          : " << energy
          << "/" << MAX_ENERGY << '\n';
     cout << "Time            : " << time
@@ -79,18 +79,22 @@ void renderRoomDetails(
 void renderAsciiBuilding(int playerFloor, int playerRoom)
 {
     cout << "\n========== BUILDING MAP ==========\n";
-    if (playerFloor < 0 || playerFloor >= NUM_FLOORS ||
-        playerRoom < 0 || playerRoom >= ROOMS_PER_FLOOR)
+
+    if (playerFloor < 1 || playerFloor > NUM_FLOORS ||
+        playerRoom < 1 || playerRoom > ROOMS_PER_FLOOR)
     {
         cout << "Invalid player location.\n";
         return;
     }
+
     for (int floor = 0; floor < NUM_FLOORS; floor++)
     {
         cout << "\nFloor " << floor + 1 << ":\n";
+
         for (int room = 0; room < ROOMS_PER_FLOOR; room++)
         {
-            if (floor == playerFloor && room == playerRoom)
+            if (floor == playerFloor - 1 &&
+                room == playerRoom - 1)
             {
                 cout << "[ P ] ";
             }
@@ -99,8 +103,10 @@ void renderAsciiBuilding(int playerFloor, int playerRoom)
                 cout << "[ R" << room + 1 << " ] ";
             }
         }
+
         cout << '\n';
     }
+
     cout << "\nP = Player's Current Room\n";
     cout << "==================================\n";
 }
