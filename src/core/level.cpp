@@ -142,10 +142,10 @@ bool loadInitialState(const char *filename,
     energy = INITIAL_ENERGY;
     time = INITIAL_TIME;
     score = INITIAL_SCORE;
-    playerFloor = 1;
-    playerRoom = 1;
     inventoryCount = 0;
     emergencyTripsLeft = 0;
+    (void)playerFloor;
+    (void)playerRoom;
 
     for (int i = 0; i < MAX_INVENTORY_CAPACITY; i++)
         inventory[i] = ENT_NONE;

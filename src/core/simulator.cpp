@@ -70,10 +70,9 @@ bool handleMoveCommand(int targetFloor, int targetRoom,
             (fromF == 4 && fromR == 0 && toF == 3 && toR == 0);
 
         bool lift1 =
-            fromR == toR &&
             (fromR == 1 || fromR == 2) &&
+            (toR == 1 || toR == 2) &&
             canUseLift1(fromF, toF);
-
         bool lift2 =
             fromR == 3 &&
             toR == 3 &&
@@ -534,7 +533,7 @@ void runSimulation(int &playerFloor, int &playerRoom,
     cout << "====================================\n";
     cout << "Mission started. Good luck!\n";
     cout << "Type 'help' to see available commands.\n";
-
+    string lastCommand = "";
     while (gameRunning)
     {
         // Check whether the mission has already ended.
@@ -551,21 +550,51 @@ void runSimulation(int &playerFloor, int &playerRoom,
         }
 
         // Display the current game information.
+        // Display information according to the previous command.
         cout << "\n------------------------------------\n";
 
-        renderDashboard(playerFloor, playerRoom,
-                        energy, time, score,
-                        inventory, inventoryCount,
-                        emergencyTripsLeft);
+        if (lastCommand == "map")
+        {
+            renderAsciiBuilding(playerFloor, playerRoom);
+        }
 
-        renderAsciiBuilding(playerFloor, playerRoom);
+        if (lastCommand == "objectives")
+        {
+            renderObjectivesChecklist(objectives);
+        }
+
+        if (lastCommand == "status")
+        {
+            renderDashboard(playerFloor, playerRoom,
+                            energy, time, score,
+                            inventory, inventoryCount,
+                            emergencyTripsLeft);
+        }
+
+        // Display remaining information in normal sequence.
+        if (lastCommand != "status")
+        {
+            renderDashboard(playerFloor, playerRoom,
+                            energy, time, score,
+                            inventory, inventoryCount,
+                            emergencyTripsLeft);
+        }
+
+        if (lastCommand != "map")
+        {
+            renderAsciiBuilding(playerFloor, playerRoom);
+        }
 
         renderRoomDetails(playerFloor - 1, playerRoom - 1,
                           roomEntities,
                           entityCounts[playerFloor - 1][playerRoom - 1]);
 
-        renderObjectivesChecklist(objectives);
+        if (lastCommand != "objectives")
+        {
+            renderObjectivesChecklist(objectives);
+        }
 
+        lastCommand = "";
         cout << "\nEnter command: ";
 
         string command;
@@ -575,6 +604,7 @@ void runSimulation(int &playerFloor, int &playerRoom,
             cout << "\nInput ended. Exiting game.\n";
             break;
         }
+        lastCommand = command;
 
         if (command == "help")
         {
@@ -740,18 +770,15 @@ void runSimulation(int &playerFloor, int &playerRoom,
         }
         else if (command == "status")
         {
-            renderDashboard(playerFloor, playerRoom,
-                            energy, time, score,
-                            inventory, inventoryCount,
-                            emergencyTripsLeft);
+            // Dashboard will be displayed first in the next refresh.
         }
         else if (command == "map")
         {
-            renderAsciiBuilding(playerFloor, playerRoom);
+            // Map will be displayed first in the next refresh.
         }
         else if (command == "objectives")
         {
-            renderObjectivesChecklist(objectives);
+            // Objectives will be displayed first in the next refresh.
         }
         else if (command == "quit")
         {
